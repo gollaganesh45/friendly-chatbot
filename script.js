@@ -137,6 +137,10 @@ function chatbotLogic(rawInput) {
   if(input.includes('who made you') || input.includes('who created you')) {
     return "I was created by a JavaScript developer — maybe someone like you!";
   }
+  
+  if(input.includes('i love you')|| input.includes("I love you")){
+    return "love you too!";
+  }
 
   // what can you do
   if(input.includes('what can you do') || input.includes('capabilities') || input.includes('help')) {

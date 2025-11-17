@@ -1,4 +1,4 @@
-/* style.css - Neon Chatbot style */
+/* style.css - Neon Chatbot style (responsive/mobile-friendly) */
 
 /* Page layout */
 :root{
@@ -13,6 +13,7 @@
   --shadow: 0 8px 30px rgba(0,0,0,0.7);
   --radius: 16px;
   --glass-border: rgba(255,255,255,0.04);
+  --container-max-width: 380px;
 }
 
 /* global body */
@@ -31,13 +32,12 @@ html,body{
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:40px;
+  padding:24px;
 }
 
 /* container */
 .container{
-  width:380px;
-  max-width:94vw;
+  width: min(var(--container-max-width), 94vw);
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
   border-radius:24px;
   padding:18px;
@@ -46,6 +46,8 @@ html,body{
   backdrop-filter: blur(8px) saturate(120%);
   position:relative;
   overflow:hidden;
+  display:flex;
+  flex-direction:column;
 }
 
 /* decorative neon strip */
@@ -82,7 +84,8 @@ html,body{
 .chat{
   background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008));
   border-radius:14px;
-  height:420px;
+  height:420px; /* fallback for desktop */
+  /* For responsiveness we will override height on smaller screens */
   overflow-y:auto;
   padding:14px;
   display:flex;
@@ -90,6 +93,7 @@ html,body{
   gap:10px;
   border:1px solid rgba(255,255,255,0.02);
   box-shadow: inset 0 4px 14px rgba(0,0,0,0.6);
+  flex: 1 1 auto; /* allow to grow/shrink inside container */
 }
 
 /* scrollbar (neat neon thumb) */
@@ -112,6 +116,7 @@ html,body{
   opacity:0;
   transform: translateY(12px) scale(0.995);
   animation: popIn 360ms cubic-bezier(.2,.9,.3,1) forwards;
+  word-wrap: break-word;
 }
 
 /* bot message style */
@@ -158,7 +163,7 @@ html,body{
   margin-top:6px;
 }
 
-/* input area */
+/* input area - we'll style for desktop and tweak for mobile below */
 .input{
   width: calc(100% - 60px);
   padding:12px 14px;
@@ -170,6 +175,7 @@ html,body{
   outline:none;
   box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);
   transition: box-shadow .18s ease, transform .12s ease;
+  font-size:15px;
 }
 
 /* button */
@@ -190,7 +196,7 @@ html,body{
   border:1px solid rgba(255,255,255,0.04);
 }
 
-/* input + button row wrapper */
+/* input + button row wrapper (desktop inline) */
 .container > .input, .container > .button { display:inline-block; vertical-align:middle; }
 
 /* input focus effect */
@@ -202,10 +208,73 @@ html,body{
 /* button hover */
 .button:hover{ transform: translateY(-3px) scale(1.02); filter:brightness(1.06) }
 
-/* small mobile adjustments */
-@media (max-width:420px){
-  .container{ width:100%; padding:12px; border-radius:14px }
-  .chat{ height:60vh }
+/* small mobile adjustments (phones / narrow screens) */
+@media (max-width: 520px) {
+  :root { --container-max-width: 100vw; }
+
+  html, body { padding: 12px; }
+  .container {
+    width: 100%;
+    padding: 12px;
+    border-radius: 14px;
+    max-height: 100vh;
+  }
+
+  .title{ font-size:18px; margin-bottom:8px; }
+
+  /* Make chat height flexible and large on mobile */
+  /* Use viewport units but subtract header + input area roughly */
+  .chat{
+    height: calc(100vh - 200px); /* adjusts to screen; tweak if needed */
+    padding:12px;
+  }
+
+  /* enlarge message text for readability */
+  .message{ font-size:15px; padding:12px 14px; }
+
+  /* make input row stacked for easier tapping */
+  .container > .input,
+  .container > .button {
+    display:block;
+    width:100%;
+    margin:8px 0 0 0;
+  }
+
+  /* bigger touch target for button */
+  .button{
+    height:52px;
+    border-radius:12px;
+    font-size:18px;
+    margin-left:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* ensure input full width */
+  .input{
+    width:100%;
+    padding:14px;
+    font-size:16px;
+  }
+
+  /* suggestions row stack (if you use suggestion chips) */
+  .suggestions-row { margin-top:10px; gap:6px; }
+  .suggestions-row button.button-suggestion { padding:8px 10px; font-size:14px; }
+
+  /* reduce neon blur to save battery on mobile */
+  .container::before{ filter: blur(18px); top:-40%; }
+  .message.bot.new::after{ filter: blur(8px); opacity:0.6; }
+
+  /* decrease scrollbar footprint */
+  .chat::-webkit-scrollbar{width:6px}
+}
+
+/* tablet / medium screens adjustments */
+@media (min-width: 521px) and (max-width: 900px) {
+  .container { width: 420px; }
+  .chat{ height:60vh; }
+  .message{ font-size:15px; }
 }
 
 /* subtle pop-in animation for messages */
@@ -252,4 +321,10 @@ html,body{
 @keyframes containerFade{
   from{ transform: scale(.995) translateY(6px); opacity:0 }
   to{ transform:none; opacity:1 }
+}
+
+/* accessibility: increase contrast when user prefers */
+@media (prefers-contrast: more) {
+  .message.bot { border-color: rgba(0,245,255,0.22); }
+  .message.user { border-color: rgba(255,72,196,0.22); }
 }
